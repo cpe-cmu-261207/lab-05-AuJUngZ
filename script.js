@@ -1,9 +1,17 @@
 const inputAdd = document.getElementById("input-add-todo");
 const todoCtn = document.getElementById("todo-container");
 
-inputAdd.onkeyup = (event) => {
-  if (event.key !== "Enter") return;
+let state = true;
 
+inputAdd.onkeyup = (event) => {
+  state = true;
+  if (event.key !== "Enter") return;
+  if (inputAdd.value === "") {
+    alert("Todo cannot be empty");
+  } else {
+    addTodo(inputAdd.value, false);
+    saveTodo();
+  }
   //your code here
 };
 
@@ -28,21 +36,73 @@ function addTodo(title, completed) {
   deleteBtn.innerText = "Delete";
   deleteBtn.className = "btn btn-danger";
 
-  //your code here
-  //append todo to HTML...
-  //define buttons event...
+  div.appendChild(span);
+  div.appendChild(doneBtn);
+  div.appendChild(deleteBtn);
+
+  doneBtn.onclick = () => {
+    if (span.style.textDecoration === "line-through") {
+      span.style.textDecoration = "none";
+      //edit in local storage
+      const data = JSON.parse(localStorage.getItem("todoListData"));
+      for (const i in data) {
+        if (data[i].title === title) {
+          data[i].completed = false;
+        }
+      }
+    } else {
+      span.style.textDecoration = "line-through";
+      //edit in local storage
+      const data = JSON.parse(localStorage.getItem("todoListData"));
+      for (const i in data) {
+        if (data[i].title === title) {
+          data[i].completed = true;
+        }
+      }
+    }
+    saveTodo();
+  };
+  deleteBtn.onclick = () => {
+    div.remove();
+    //delete from local storage
+    const data = JSON.parse(localStorage.getItem("todoListData"));
+    for (const i in data) {
+      if (data[i].title === title) {
+        data.splice(i, 1);
+      }
+    }
+    saveTodo();
+  };
+  if (state === true) {
+    todoCtn.prepend(div);
+  } else {
+    todoCtn.appendChild(div);
+  }
+  inputAdd.value = "";
 }
 
 function saveTodo() {
   const data = [];
   for (const todoDiv of todoCtn.children) {
-    //your code here
+    const todoobj = {};
+    todoobj.title = todoDiv.children[0].innerText;
+    todoobj.completed =
+      todoDiv.children[0].style.textDecoration === "line-through";
+    data.push(todoobj);
   }
-  //your code here
+  const json = JSON.stringify(data);
+  localStorage.setItem("todoListData", json);
 }
 
 function loadTodo() {
-  //your code here
+  state = false;
+  const dataStr = localStorage.getItem("todoListData");
+  const data = JSON.parse(dataStr); //array of objects
+  console.log(data);
+
+  for (const todoobj of data) {
+    addTodo(todoobj.title, todoobj.completed);
+  }
 }
 
 loadTodo();
