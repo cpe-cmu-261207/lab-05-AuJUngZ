@@ -40,6 +40,19 @@ function addTodo(title, completed) {
   div.appendChild(doneBtn);
   div.appendChild(deleteBtn);
 
+  doneBtn.style.visibility = "hidden";
+  deleteBtn.style.visibility = "hidden";
+
+  div.onmouseover = () => {
+    doneBtn.style.visibility = "visible";
+    deleteBtn.style.visibility = "visible";
+  };
+
+  div.onmouseout = () => {
+    doneBtn.style.visibility = "hidden";
+    deleteBtn.style.visibility = "hidden";
+  };
+
   doneBtn.onclick = () => {
     if (span.style.textDecoration === "line-through") {
       span.style.textDecoration = "none";
